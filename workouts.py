@@ -10,12 +10,12 @@ class Workouts:
     """
     A class to fetch workout data from the Withings API.
     """
-    def __init__(self, access_token):
+
+    def __init__(self, access_token: str):
         self.access_token = access_token
         self.url = "https://wbsapi.withings.net/v2/measure"
         self.start_date: datetime = None
         self.end_date: datetime = None
-
 
     def _get_workout_data(
             self, start_date: datetime = None, end_date: datetime = None,
@@ -28,7 +28,8 @@ class Workouts:
             list: A list of workout data for the previous month.
         """
         today = datetime.today()
-        self.start_date = start_date or datetime(today.year, today.month - 1, 1) if today.month > 1 else datetime(today.year - 1, 12, 1)
+        self.start_date = start_date or datetime(today.year, today.month - 1, 1) if today.month > 1 else datetime(
+            today.year - 1, 12, 1)
         self.end_date = end_date or datetime(today.year, today.month, 1) - timedelta(days=1)
 
         params = {
@@ -54,11 +55,11 @@ class Workouts:
         else:
             print("Error fetching workout data. Please check your access token and try again.")
 
-    def count_workouts_per_category(self) -> Dict[WorkoutCategory, int]:
+    def count_workouts(self, start_date: datetime = None, end_date: datetime = None) -> Dict[WorkoutCategory, int]:
         """
         Counts the number of workouts per category for the previous month and prints the results.
         """
-        workout_data = self._get_workout_data()
+        workout_data = self._get_workout_data(start_date, end_date)
 
         workouts_per_category = {}
         for workout in workout_data:
