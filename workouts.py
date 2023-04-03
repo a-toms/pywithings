@@ -1,11 +1,9 @@
-import os
+from datetime import datetime, timedelta
+from typing import *
 
 import requests
-from datetime import datetime, timedelta
+
 from constants import WorkoutCategory
-from typing import *
-from pprint import pprint
-import turtle
 
 
 class Workouts:
