@@ -56,12 +56,6 @@ class Workouts:
         else:
             print("Error fetching workout data. Please check your access token and try again.")
 
-    def print_workout_data(self) -> None:
-        workout_data = self._get_workout_data()
-        print(f"Workout Data for {self.start_date.strftime('%d %B %Y')} to {self.end_date.strftime('%d %B %Y')}:")
-        for workout in workout_data:
-            pprint(workout)
-
     def count_workouts_per_category(self) -> Dict[WorkoutCategory, int]:
         """
         Counts the number of workouts per category for the previous month and prints the results.
@@ -73,9 +67,9 @@ class Workouts:
             workout_category = WorkoutCategory(int(workout["category"]))
             workouts_per_category[workout_category] = workouts_per_category.get(workout_category, 0) + 1
 
-        print("Number of Workouts per category for the Previous Month:")
+        print(f"\nWorkout Data for {self.start_date.strftime('%d %B %Y')} to {self.end_date.strftime('%d %B %Y')}:")
         for category, count in workouts_per_category.items():
-            print(f"{category.name}: {count} : {'*' * count}
+            print(f"{category.name}: {count}")
         return workouts_per_category
 
 
