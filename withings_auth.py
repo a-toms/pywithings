@@ -1,6 +1,5 @@
 import os
 import requests
-from flask import Flask, request
 import webbrowser
 
 
@@ -44,8 +43,8 @@ def authenticate_with_withings():
 
             # Write to secrets.env
             with open("secrets.env", "a") as f:
-                f.write(f"ACCESS_TOKEN={access_token}")
-                f.write(f"REFRESH_TOKEN={refresh_token}")
+                f.write(f"ACCESS_TOKEN={access_token}\n")
+                f.write(f"REFRESH_TOKEN={refresh_token}\n")
 
             print(
                 f"Authentication successful!\nAccess token ={access_token}\nRefresh token= {refresh_token}.\n"
