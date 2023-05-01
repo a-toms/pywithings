@@ -3,7 +3,8 @@ from typing import *
 
 import requests
 
-from constants import WorkoutCategory
+from constants import WorkoutCategory, AccessTokenError
+from helpers import load_secrets_into_environment
 
 
 class Workouts:
@@ -31,6 +32,10 @@ class Workouts:
         self.start_date = start_date or datetime(today.year, today.month - 1, 1) if today.month > 1 else datetime(
             today.year - 1, 12, 1)
         self.end_date = end_date or datetime(today.year, today.month, 1) - timedelta(days=1)
+        print(
+            f"Getting workout data between {self.start_date.strftime('%Y-%m-%d')} "
+            f"and {self.end_date.strftime('%Y-%m-%d')}"
+        )
 
         params = {
             "action": "getworkouts",
@@ -40,20 +45,24 @@ class Workouts:
         headers = {
             "Authorization": f"Bearer {self.access_token}"
         }
-        response = requests.get(self.url, params=params, headers=headers)
+        response = requests.post(self.url, params=params, headers=headers)
 
-        if response.status_code == 200:
-            workout_data = response.json()
+        data = response.json()
+
+        if response.status_code == 200 and data["status"] == 0:
             if not include_walking_as_workout:
                 print("Excluding walking as a workout.")
                 return [
-                    workout for workout in workout_data["body"]["series"]
+                    workout for workout in data["body"]["series"]
                     if workout["category"] != WorkoutCategory.Walking.value
                 ]
             else:
-                return workout_data["body"]["series"]
+                return data["body"]["series"]
         else:
-            print("Error fetching workout data. Please check your access token and try again.")
+            raise AccessTokenError(
+                f"Error fetching workout data. Please check your access token and try again."
+                f"\n{data}"
+            )
 
     def count_workouts(self, start_date: datetime = None, end_date: datetime = None) -> Dict[WorkoutCategory, int]:
         """
@@ -73,6 +82,7 @@ class Workouts:
 
 
 if __name__ == "__main__":
-    access_token = input("Your access token: ")
+    load_secrets_into_environment()
+    access_token = input("Enter your access token:")
     wos = Workouts(access_token)
-    wos.count_workouts_per_category()
+    wos.count_workouts()

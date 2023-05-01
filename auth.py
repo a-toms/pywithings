@@ -1,7 +1,7 @@
 import os
-import requests
 import webbrowser
 
+import requests
 
 redirect_uri = "https://tde.is"  # This must match the redirect URI you set in the Withings account webui.  I use tde.is because it's a domain I own.
 
@@ -17,8 +17,8 @@ def authenticate_with_withings():
     # Step: Find the authorization code in the callback URL (code=<AUTH_CODE>), and then paste it into the console.
     auth_code = input(
         "Now, find and enter your authorization code below.\n"
-        "This is the code that you will find in the callback URL between 'code=' and '&state'."
-        "(You must first click to allow the app to access your data).\n "
+        "This is the code that you will find in the callback URL between 'code=' and '&state'.\n"
+        "You must first click to allow the app to access your data.\n "
         "\n> "
     )
 
@@ -40,15 +40,12 @@ def authenticate_with_withings():
         try:
             access_token = token_data['body']['access_token']
             refresh_token = token_data['body']['refresh_token']
-
-            # Write to secrets.env
-            with open("secrets.env", "a") as f:
-                f.write(f"ACCESS_TOKEN={access_token}\n")
-                f.write(f"REFRESH_TOKEN={refresh_token}\n")
+            os.environ["ACCESS_TOKEN"] = access_token
+            os.environ["REFRESH_TOKEN"] = refresh_token
 
             print(
-                f"Authentication successful!\nAccess token ={access_token}\nRefresh token= {refresh_token}.\n"
-                f"We added these to your local secrets.env file. You can now access the Withings API."
+                f"Authentication successful!\nAccess token={access_token}\nRefresh token={refresh_token}.\n"
+                f"We added these to your local secrets.env file. You can now access your data with the Withings API."
             )
         except KeyError:
             print(f"Failed to get access token. Error: {token_response.text}")
@@ -58,7 +55,7 @@ def authenticate_with_withings():
         return "Authentication failed. Check the console for more details.", 400
 
 
-def add_secrets_locally():
+def add_client_credentials():
     """
     This function is used to add user API keys to the secrets.env file locally.
     This allows us to avoid re-entering the keys every time we run the script, while still keeping the keys private.
@@ -89,6 +86,19 @@ def input_client_details():
         print("We added CLIENT_ID and CLIENT_SECRET to secrets.env locally.")
 
 
+def write_secrets_to_file():
+    """
+    We use this function to write the secrets to the secrets.env file.
+    This includes overwriting previous secrets.
+    """
+    with open("secrets.env", "w") as f:
+        f.write(f"ACCESS_TOKEN={os.environ['ACCESS_TOKEN']}\n")
+        f.write(f"REFRESH_TOKEN={os.environ['REFRESH_TOKEN']}\n")
+        f.write(f"CLIENT_ID={os.environ['CLIENT_ID']}\n")
+        f.write(f"CLIENT_SECRET={os.environ['CLIENT_SECRET']}\n")
+
+
 if __name__ == "__main__":
-    add_secrets_locally()
+    add_client_credentials()
     authenticate_with_withings()
+    write_secrets_to_file()

@@ -47,3 +47,8 @@ class WorkoutCategory(Enum):
     Indoor_Running = 307
     Indoor_Cycling = 308
     Robot_Withings = 457
+
+
+class AccessTokenError(Exception):
+    def __init__(self, message="Access token has expired"):
+        super().__init__(message)
