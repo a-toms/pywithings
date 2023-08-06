@@ -70,15 +70,22 @@ class Workouts:
         """
         workout_data = self._get_workout_data(start_date, end_date)
 
-        workouts_per_category = {}
+        # Create a dictionary to store the workout data. The key: workout category, value is a list of dates.
+        workouts = {}
         for workout in workout_data:
+            date = datetime.fromtimestamp(workout["startdate"]).date()
             workout_category = WorkoutCategory(int(workout["category"]))
-            workouts_per_category[workout_category] = workouts_per_category.get(workout_category, 0) + 1
 
+            # Add the workout date if no workout for the category and for the day.
+            existing_workout_dates = workouts.get(workout_category, [])
+            if date not in existing_workout_dates:
+                workouts[workout_category] = existing_workout_dates + [date]
+
+        print(f'{workouts = }')
         print(f"\nWorkout Data for {self.start_date.strftime('%d %B %Y')} to {self.end_date.strftime('%d %B %Y')}:")
-        for category, count in workouts_per_category.items():
-            print(f"{category.name}: {count}")
-        return workouts_per_category
+        for category, dates in workouts.items():
+            print(f"{category.name}: {len(dates)}")
+        return workouts
 
 
 if __name__ == "__main__":
